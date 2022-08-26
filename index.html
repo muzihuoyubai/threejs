@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="importmap">
+        {
+            "imports": {
+                "three": "./node_modules/three/build/three.module.js",
+                "OrbitControls": "./node_modules/three/examples/jsm/controls/OrbitControls.js",
+                "OBJLoader": "./node_modules/three/examples/jsm/loaders/OBJLoader.js",
+                "OBJExporter": "./node_modules/three/examples/jsm/exporters/OBJExporter.js"
+            }
+        }
+
+  </script>
+  <meta charset="utf-8">
+  <title>组合切角</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<script type="module">
+  import * as THREE from 'three';
+  import {OrbitControls} from 'OrbitControls';
+  import {OBJLoader} from 'OBJLoader';
+
+  let textureLoader = new THREE.TextureLoader();
+  const renderer = new THREE.WebGLRenderer({antialias: true});
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight);
+  camera.position.set(2, 0, 0)
+  camera.lookAt(new THREE.Vector3(0, 0, 1,))
+  scene.background = new THREE.Color("#ffffff");
+
+  //画布大小
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  //分辨率
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  document.body.appendChild(renderer.domElement);
+
+  //光源,第二个参数代表光强度
+  const point = new THREE.PointLight(0xffffff, 0.5); //光源设置
+  point.position.set(300, 400, 200); //点光源位置
+  scene.add(point); //将光源添加到场景中
+  const ambient = new THREE.AmbientLight(0xffffff, 0.4); //环境光
+  ambient.position.set(200, 300, 200); //点光源位置
+  scene.add(ambient);
+
+  //鼠标事件
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.addEventListener('change', render);
+  //是否可以缩放
+  controls.enableZoom = true;
+  //相机距离远点的最近距离
+  controls.minDistance = 2;
+  //相机距离远点的最远距离
+  controls.maxDistance = 10;
+  //是否开起右键拖动
+  controls.enablePan = true;
+  controls.target.set(0, 0, 0);
+  controls.update();
+
+  //测试数据，待切角的柜子
+  const loader = new OBJLoader();
+
+  function pubItemToPosition(item, partPos) {
+    item.geometry.scale(0.001, 0.001, 0.001);
+    item.position.x = partPos.point.x / 1000
+    item.position.y = partPos.point.y / 1000
+    item.position.z = -partPos.point.z / 1000
+    item.rotation.x = -0.5 * Math.PI;
+  }
+
+  loader.load("./resource/50304_right.obj", function (obj) {
+    obj.children.forEach(function (item) {
+      item.geometry.scale(0.001, 0.001, 0.001);
+      item.position.x = 0
+      item.position.y = 0
+      item.position.z = -0.433
+      item.rotation.x = -0.5 * Math.PI;
+    });
+    scene.add(obj);
+  });
+
+  loader.load("./resource/50306_left.obj", function (obj) {
+    obj.children.forEach(function (item) {
+      item.geometry.scale(0.001, 0.001, 0.001);
+      item.position.x = 0
+      item.position.y = 0
+      item.position.z = 0
+      item.rotation.x = -0.5 * Math.PI;
+    });
+    scene.add(obj);
+  });
+
+  loader.load("./resource/7859587_bottom.obj", function (obj) {
+    obj.children.forEach(function (item) {
+      item.geometry.scale(0.001, 0.001, 0.001);
+      item.position.x = 0
+      item.position.y = 0
+      item.position.z = 0
+      item.rotation.x = -0.5 * Math.PI;
+    });
+    scene.add(obj);
+  });
+
+  loader.load("./resource/7859603_top.obj", function (obj) {
+    obj.children.forEach(function (item) {
+      item.geometry.scale(0.001, 0.001, 0.001);
+      item.position.x = 0
+      item.position.y = 0.433
+      item.position.z = 0
+      item.rotation.x = -0.5 * Math.PI;
+    });
+    scene.add(obj);
+    render();
+  });
+
+  function render() {
+    renderer.render(scene, camera);
+  }
+
+</script>
+</body>
+</html>
